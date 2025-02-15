@@ -1,5 +1,7 @@
-from tests import client
+from tests import app
+from fastapi.testclient import TestClient
 
+client = TestClient(app)
 
 def test_get_all_books():
     response = client.get("/books/")
@@ -50,3 +52,14 @@ def test_delete_book():
 
     response = client.get("/books/3")
     assert response.status_code == 404
+
+def test_get_book_by_id():
+    # Test with a valid book ID
+    response = client.get("/api/v1/books/1")
+    assert response.status_code == 200
+    assert response.json()["id"] == 1
+
+    # Test with an invalid book ID
+    response = client.get("/api/v1/books/999")
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Book not found"
